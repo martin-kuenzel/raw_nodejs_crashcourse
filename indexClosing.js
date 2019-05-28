@@ -17,7 +17,7 @@ const server = http.createServer( (rq,rs) => {
             <br><a href="/gsCalc" title="you're welcome">Connecting speakers ?</a>
         `);
     }
-    if( rq.url == "/gsCalc" ){
+    else if( rq.url == "/gsCalc" ){
         fs.readFile( 
             path.join( __dirname,'public','gsCalc.html' ),
             ( err, data ) => {
@@ -26,7 +26,7 @@ const server = http.createServer( (rq,rs) => {
                 rs.end(data);
             });
     }
-    if( rq.url == "/stat" ){
+    else if( rq.url == "/stat" ){
         rs.writeHead(200,{ "Content-Type": "text/html" })
         rs.end(`
             <h1>Server information</h1>
@@ -41,7 +41,7 @@ const server = http.createServer( (rq,rs) => {
             <br><a href="/">return</a>
         `);
     }
-    if( rq.url == "/stat_json" ){
+    else if( rq.url == "/stat_json" ){
         rs.writeHead(200,{ "Content-Type": "application/json" })
         rs.end(
             JSON.stringify({
@@ -54,6 +54,30 @@ const server = http.createServer( (rq,rs) => {
                 MemoryFree: os.freemem()
             })
         );
+    }
+    else {
+        // DYNAMICALLY SWITCHING FILETYPES IN PUBLIC //
+        let filePath = path.join(__dirname,'public', rq.url === '/' ? '/' : rq.url );
+        let contentType = "text/html";
+
+        // SWITCH CASE with contenttypes here
+        let extname = path.extname(filePath);
+        switch(extname){
+            case 'css': contentType = 'text/css'; break;
+            case 'js': contentType = 'text/javascript'; break;
+            case 'json': contentType = 'application/json'; break;
+            case 'css': contentType = 'text/css'; break;
+            case 'html': contentType = 'text/html'; break;
+        }
+
+        fs.readFile(filePath, (err,data) => {
+            if(err && err.code == 'ENOENT'){
+                rs.writeHead(404);
+                rs.end("404 Page not found.")
+            }
+            rs.writeHead(200,{ "Content-Type": contentType })
+            rs.end(data)
+        });
     }
 });
 

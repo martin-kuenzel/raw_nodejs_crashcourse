@@ -1,0 +1,81 @@
+<html>
+<head>
+<script>
+var e_num = (val) => {
+   	let _reaktionen_aktionen_ = [];
+    let _reaktionen_all_ = {
+        Mathematik: (a) => { return {
+            Nummerntheorie: {
+                kleinsterModulus:((a)=>{ for( let i=2; i<=a; i++ ) if( a%i === 0) return { f:`${a} mod ${i} = 0`, e: i, i: a}; })(a),
+                primzahl: ((a)=>{ 
+                    let o = { f:`isPrimeNumber(${a}) = false`, e: a, i: a }; 
+                    for( let i=2; i<=a; i++ ) if( a>2 && ( a%i === 0 || a===i )){ o.f=`isPrimeNumber(${a}) = ${a===i};`; o.e=a===i; break; } 
+                    return o; 
+                })(a)
+            }
+            ,Geometrie:{
+                Quadrat: ((a) => { return {
+                    type: "Quadrat",
+                    A: ((a)=>{ let o = Math.pow(a,2); return { f:`A = a⋅a = ${o}`, e: o, i:a }; })(a),
+                    U: ((a)=>{ let o = a*4; return { f:`U = 4a = ${o}`, e: o, i: a }; })(a),
+                }})(a),
+                Kubus:  ((a) => { return {
+                    type: "Kubus",
+                    k: ((a) => { let o = 12*a; return { f:`Summe der Kantenlängen: 12s = ${o}`, e:o, i:a }})(a),
+                    d: ((a)=>{ let o = Math.sqrt(a,2); return { f:`mit s=${a}; Flächendiagonale: d = s * \u221A(2) = ${o}`, e: o, i:a }; })(a),
+                    d_r: ((a)=>{ let o = Math.sqrt(Math.sqrt(a)); return { f:`mit s=${a}; Raumdiagonale: d_r = s * \u221A(3) = ${o}`, e: o, i:a }; })(a),
+                    s: ((a)=>{ let o = Math.pow(a,2); return { f:`mit d=${a}; Kantenlänge: s = d² = ${o}`, e: o, i:a }; })(a),
+                    s_r: ((a)=>{ let o = Math.pow(a,3); return { f:`mit d_r=${a}; Kantenlänge_R: s = d_r³ = ${o}`, e: o, i:a }; })(a),
+                    V: ((a)=>{ let o = Math.pow(a,3); return { f:`V = s³ = ${o}`, e: o, i: a }; })(a),
+                    O: ((a)=>{ let o = Math.pow(a,2)*6; return { f:`O = 6 * s² = ${o}`, e:o, i:a }; } )(a)
+                }})(a),
+                Kreis: ((a) => { return {
+                    type: "Kreis",
+                    r: ((a)=>{ let o = 2*a; return { f:`mit r=${a} Durchmesser: d = 2 * r = ${o}`, e:o, i:a }; } )(a),
+                    d: ((a)=>{ let o = a/2; return { f:`mit d=${a} Radius: r = d / 2 = ${o}`, e:o, i:a }; } )(a),
+                    A: ((a)=>{ let o = Math.pow(a,2)*Math.PI; return { f:`mit r=${a} Kreisfläche: A = r² * &pi; = ${o}`, e:o, i:a }; } )(a),
+                    a: ((a)=>{ let o = Math.pow(a,2)*Math.PI / 4; return { f:`mit d=${a} Kreisfläche: &alpha; = ( d² * &pi; ) / 4 = ${o}`, e:o, i:a }; } )(a),
+                    b: ((a)=>{ return { f:`mit r=${a} Bogenlänge: b = ( r * &pi; * &alpha; ) / 180 = not implemented`, e:NaN, i:a }; })(a),
+                    A_r: ((a)=>{ return { f:`mit r=${a} Flächeninhalt: A = ( r² * &pi; * &alpha; ) / 360 = not implemented`, e:NaN, i:a }; })(a),
+                    A_b: ((a)=>{ return { f:`mit b=${a} Flächeninhalt: A = ( b * r ) / 2 = not implemented`, e:NaN, i:a }; })(a),
+                    u: ((a)=>{ return { f:`mit r=${a} Umfang: u = 2 * r + ( r * &pi; * &alpha; ) / 180 = not implemented`, e:NaN, i:a }; })(a),
+                    etc: ((a)=>{ return `
+                    Kreisring: u = 2 * &pi; * (r_1 + r_2) = not implemented<br/>
+                    Kreisring: A = &pi; * (r_1² - r_2²) = not implemented<br/>
+                    Zentriwinkel: &beta; = 2 * &alpha; = not implemented
+                    `})(a)
+                }})(a),
+                Dreieck: ((a) => { return {
+                    type: "gleichschenkliches rechtwinkliges Dreieck",
+                    c: ( (a)=>{ let o = Math.sqrt( Math.pow(a,2) * 2 ); return { f:`mit a=${a}; c = \u221A(a²+a²) = ${o}`, e: o, i:a }; } )(a),
+                    a: ( (c)=>{ let o = Math.pow(c,2)/2; return { f:`mit c=${c}; a = c²/2 = ${o}`, e: o, i:a }; } )(a),
+                    U: ( (a)=>{ let o = a*2 + Math.sqrt( Math.pow(a,2) * 2 ); return { f:`U = 2a + c = ${o}`, e: o, i:a }; } )(a),
+                    h: ( (a)=>{ let o = (a*Math.sqrt(2))/2; return { f:`h = a * √2 : 2 = ${o}`, e: o, i:a }; } )(a)
+                }})(a)
+            }
+        } }
+    };
+    return ( _reaktionen_all_.Mathematik(val) )//.map(x=>x.Nummerntheorie.primzahl.i).join('+') );
+}
+fn_ev = (test) => {
+  s="<fieldset>";
+  for( let i = 0, keys = Object.keys( test ), vals = Object.values( test ); i<keys.length; i++ ) {
+	  s += `<fieldset><legend>${keys[i]}</legend><div>`;
+	  if( typeof(vals[i])==="object" )
+		  s += fn_ev( vals[i] )
+	  else 
+		  s += `${vals[i]}`;
+	  s += `</div></fieldset>`
+    }
+  return s+'</fieldset>';
+}
+window.onload = () => {
+  document.body.innerHTML = `
+  <label for="e_num">Nummernanalyse</label><input id="e_num" type="text" default=0 oninput="let r=document.getElementById('result'); let o=''; try{ let x=eval(this.value); if(!isNaN(x)) o = fn_ev(e_num(x),r); } catch(e){ o = e.message }; r.innerHTML = o;" />
+  <p style="font-size:12px;" id="result"></p>
+  `;
+};
+</script>
+</head>
+<body></body>
+</html>
