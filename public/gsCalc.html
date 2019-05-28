@@ -1,0 +1,232 @@
+<html charset="utf-8">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		
+		<script type="text/javascript">		
+		  let rd = (a,b) => { return Math.round( a * (b?b:1000) ) / (b?b:1000); }
+		  
+      var  _getWiederstandAbsolute = () => { 
+        let U = document.getElementById("U").valueAsNumber;
+        let R = document.getElementById("R").value;
+        let I = document.getElementById("I").valueAsNumber;
+        let P = document.getElementById("P").valueAsNumber; 
+        
+	      let rges = getWiederstandAbsolute( U, R, I, P );
+	
+        let _str = (a,u,alt) => { return !a ? (alt?alt:"nicht angegeben") : `${a} ${u}`; }
+        	
+        var _toStr = (a,b) =>  {
+          try{ return a.map( x => rd(x,b) ).join(', ') + ' = ' + ( rd( eval( a.join('+') ) ) )
+          } catch(e){console.log(e)}
+        }
+        
+        rges.arbeit_reihe_graph = []; 
+        rges.arbeit_reihe = 0; 
+        try{
+          rges.arbeit_reihe = eval( rges.p_reihe.join('+') );
+          for( var t = 0; t<10; t++ ){
+            rges.arbeit_reihe_graph.push( { x: t, y: eval( rges.p_reihe.map( (x) => x * t ).join('+') ) } )
+          }
+        } catch(e){}
+        
+        rges.arbeit_parallel_graph = []; 
+        rges.arbeit_parallel = 0; 
+        try{
+          rges.arbeit_parallel = eval( rges.p_parallel.join('+') );
+          for( var t = 0; t<10; t++ ){
+            rges.arbeit_parallel_graph.push( { x: t, y: eval( rges.p_parallel.map( (x) => x * t ).join('+') ) } )
+          }
+        } catch(e){}
+        
+        rges.p_reihe = _toStr(rges.p_reihe);
+        rges.u_reihe = _toStr(rges.u_reihe);
+        rges.r_reihe = _toStr(rges.r_reihe);
+        
+        rges.i_parallel = _toStr(rges.i_parallel);
+        rges.p_parallel = _toStr(rges.p_parallel);
+        
+        try{ 
+          rges.r_parallel = ( rges.r_parallel.length>1 ) ? 
+            `${rges.r_parallel.map(x=>"1/"+(1/x)+" = "+x).join(', ')} = 1/${eval(rges.r_parallel.join('+'))} = ${rd(1/eval(rges.r_parallel.join('+')))}` : 
+            rges.r_reihe
+        } catch(e){console.log(e)}
+        
+	      document.getElementById("Rges").innerHTML = `<pre>
+
+Angegeben:
+
+  Spannung: ${_str(rges.U,"Volt")}
+  Wiederstand: ${_str(rges.R,"Ω",!R?"nicht angegeben <b>Rechnungen sind daher f&uuml;r Parallel- und Reihenschaltung gleich</b>":"")} 
+  Stromst&auml;rke: ${ _str( rges.I,"Ampere" + ( rges.R && rges.I && U ? "&nbsp;<b>Stromst&auml;rke ignoriert weil U und R angegeben wurden</b>" : "" ) ) }
+  Leistung: ${ _str( rges.P, "Watt" + ( ( (rges.I||rges.R) && rges.U && (I||R) ) ?"&nbsp;<b>Leistung ignoriert weil U und I, oder R angegeben wurden</b>":"")) }
+
+Berechnet:
+
+  || Schaltung mit Reihenwiederstand ||
+
+    Leistung: ${rges.p_reihe} Watt
+    Wiederstand: ${rges.r_reihe} Ω
+    Spannung: ${rges.u_reihe} Volt
+    Stromst&auml;rke: ${rges.i_reihe} Ampere
+    Elektr. Arbeit: ${rges.arbeit_reihe} Ws => ${rd(rges.arbeit_reihe/(3600*1000),10e5)} Kwh
+
+  || Schaltung mit Parallelwiederstand ||
+
+    Leistung: ${rges.p_parallel} Watt
+    Wiederstand: ${rges.r_parallel} Ω
+    Spannung: ${rges.u_parallel} Volt
+    Stromst&auml;rke: ${rges.i_parallel} Ampere
+    Elektr. Arbeit: ${rges.arbeit_parallel} Ws => ${rd(rges.arbeit_parallel/(3600*1000),10e5)} Kwh
+		
+	      </pre>`;
+	      console.log(rges);
+      }
+      var getWiederstandAbsolute = (U,R,I,P)=>{ 
+	      let _P = ((U,R,I)=>{
+          try{ if(!isNaN(U)&&!isNaN(R)) return Math.pow(U,2)/R; } catch(e){}
+          try{ if(!isNaN(U)&&!isNaN(I)) return U*I; }catch(e){}
+          try{ if(!isNaN(I)&&!isNaN(R)) return Math.pow(I,2)*R; } catch(e){}
+	      });
+
+	      let _U = ((R,I,P)=>{
+          try{ if(!isNaN(P)&&!isNaN(I)) return P/I; }catch(e){}
+          try{ if(!isNaN(P)&&!isNaN(R)) return Math.sqrt(P*R); } catch(e){}
+          try{ if(!isNaN(I)&&!isNaN(R)) return I*R; } catch(e){}
+	      });
+
+	      let _I = ((U,R,P)=>{
+          try{ if(!isNaN(U)&&!isNaN(R)) return U/R; } catch(e){}
+          try{ if(!isNaN(P)&&!isNaN(U)) return P/U; }catch(e){}
+	      });
+
+	      let _R = ((U,I,P)=>{
+          try{ if(!isNaN(U)&&!isNaN(I)) return U/I; } catch(e){}
+          try{ if(!isNaN(U)&&!isNaN(P)) return Math.pow(U,2)/P; } catch(e){}
+          try{ if(!isNaN(I)&&!isNaN(P)) return P / Math.pow(I,2); } catch(e){}
+	      });
+
+        let ret = {
+	          U: U,
+	          I: I,
+	          P: P,
+	          R: R,
+            parallel: [ _R(U,I,P) ],
+            reihe:  [ _R(U,I,P) ],
+            u_reihe: [],
+            r_reihe: [],
+            i_reihe: [],
+            p_reihe: [],
+            u_parallel: [],
+            r_parallel: [],
+            i_parallel: [],
+            p_parallel: []
+        }
+              
+	      if( !R.match(/^[^0-9]*$/) ) {
+	        R = R.split(/[,|&+]/);
+          ret.parallel = ((U,R,I)=>{ 
+              let Rges = 0;
+              R.map(x=>{ try{ 
+                  let n = (1/x); 
+                  Rges += n;
+                  ret.r_parallel.push(1/x);
+              } catch(e){console.warn(e);} });
+              if(U) {
+                ret.u_parallel = [U];
+                R.map(x=>{ try{ ret.i_parallel.push( U/x ); } catch(e){console.warn(e);} });
+                R.map(x=>{ try{ ret.p_parallel.push( Math.pow(U,2) / x ); } catch(e){console.warn(e);} });
+              }
+              else if(I) {
+                R.map(x=>{ try{ ret.i_parallel.push( (I/Rges)/x ); } catch(e){console.warn(e);} })
+                
+                let U = Math.pow(I,2) / Rges;
+                ret.u_parallel = [ U ];
+                //R.map(x=>{ try{ ret.u_reihe.push( I/x ); } catch(e){console.warn(e);} });
+                
+                //R.map(x=>{ try{ ret.p_parallel.push( ( U * x ); } catch(e){console.warn(e);} });
+                R.map(x=>{ try{ ret.p_parallel.push( Math.pow(U,2) / x ); } catch(e){console.warn(e);} });
+              }
+              else if(P) {
+                let U = Math.sqrt((1/Rges)*P)
+                ret.u_parallel = [U];
+                
+                R.map(x=>{ try{ ret.i_parallel.push( (U/x) ); } catch(e){console.warn(e);} });
+                R.map(x=>{ try{ ret.p_parallel.push( Math.pow(U,2) / x ); } catch(e){console.warn(e);} });
+              }
+              
+              return Rges === 0 ? 0 : 1/Rges;
+          })(U,R,I);
+          ret.reihe = ((U,R,I)=>{
+              let Rges = 0;
+              R.map(x=>{ 
+                try{ 
+                  let n = Number(x);
+                  Rges += n;
+                  ret.r_reihe.push(x);
+                } catch(e){console.warn(e);} 
+              });
+              if(U) {
+                ret.i_reihe = [U / Rges];
+                
+                R.map(x=>{ try{ ret.u_reihe.push( U * (x/Rges) ); } catch(e){console.warn(e);} });
+                R.map(x=>{ try{ ret.p_reihe.push( Math.pow(U,2)/x ); } catch(e){console.warn(e);} });
+              }
+              else if(I) {
+                ret.i_reihe = [I];
+                
+                //if( R.length==1 ) ret.u_reihe = [ I * Rges ];
+                //else 
+                R.map(x=>{ try{ ret.u_reihe.push( (I * x) ); } catch(e){console.warn(e);} });
+                R.map(x=>{ try{ ret.p_reihe.push( Math.pow(I,2) * x ); } catch(e){console.warn(e);} });
+              }
+              else if(P) {
+                let I = Math.sqrt(Rges*P)/Rges;  
+                ret.i_reihe = [I];
+                
+                //ret.p_reihe = [P];
+                
+                //let U = Math.sqrt(Rges*P);
+                R.map(x=>{ try{ ret.p_reihe.push( Math.pow(I,2) * x ); } catch(e){console.warn(e);} });
+                R.map(x=>{ try{ ret.u_reihe.push( (I * x) ); } catch(e){console.warn(e);} });
+                //R.map(x=>{ try{ ret.u_reihe.push( (U/Rges)*x ); } catch(e){console.warn(e);} });
+              }
+              return Rges
+          })(U,R,I)
+        }
+
+        try{
+          if( !R ){
+            ret.u_parallel = [ U ? U : _U(ret.parallel,I,P) ];
+            ret.u_reihe = [ U ? U : _U(ret.reihe,I,P) ];
+	          ret.i_parallel = [ I ? I : _I(ret.u_parallel,ret.parallel,P) ];
+	          
+            ret.p_reihe = [ P && !(U && I) ? P : _P(ret.u_reihe,ret.reihe,I) ];
+            ret.p_parallel = [ P && !(U && I) ? P : _P(ret.u_parallel,ret.parallel,I) ];
+	          
+	          ret.r_parallel = ret.parallel;
+	          ret.r_reihe = ret.reihe;
+          }
+        } catch(e){ console.warn(e); }
+        
+        if(ret.i_reihe.length == 0 ) ret.i_reihe = I && !(R) ? I : _I(ret.u_reihe,ret.reihe,P);
+        
+	      return ret;
+      };
+		  window.onload = () => {
+      document.body.innerHTML = `
+        <style>div {display: flex; width: max-content; flex-direction: column;} div > div { display: flex; justify-content: space-between; }</style>
+        <div>
+	        <div><label for="U">Spannung:&nbsp;</label><input id="U" type="number" min=0 placeholder="in Volt" oninput="_getWiederstandAbsolute()"/></div>
+	        <div><label for="R">Wiederstand:&nbsp;</label><input id="R" type="text" placeholder="in Ohm (eg. 1+4+5)" oninput="_getWiederstandAbsolute()"/></div>
+	        <div><label for="I">Stromst&auml;rke:&nbsp;</label><input id="I" type="number" min=0 placeholder="in Ampere" oninput="_getWiederstandAbsolute()"/></div>
+	        <div><label for="P">Leistung:&nbsp;</label><input id="P" type="number" min=0 placeholder="in Watt" oninput="_getWiederstandAbsolute()"/></div>
+	      </div>
+        <div id="Rges"></div>
+        <br><br><a href="/">return</a>
+      `;
+    }
+		</script>
+	</head>
+	<body>
+	</body>
+</html>
