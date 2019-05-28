@@ -3,6 +3,6 @@ class Person {
         this.prename = prename;
         this.name = name;
     }
-    toString(){ return `My name is ${this.prename} ${this.name}`; };
+    toString(){ return `Hello. My name is ${this.prename} ${this.name}`; };
 }
 module.exports = Person;

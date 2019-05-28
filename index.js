@@ -1,3 +1,2 @@
-console.log("Hello World!");
-var Person = require("./person");
+const Person = require("./person");
 console.log( ( new Person("Martin","the Codejunky") ).toString() );
