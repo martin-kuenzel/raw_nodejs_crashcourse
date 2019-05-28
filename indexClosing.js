@@ -41,6 +41,20 @@ const server = http.createServer( (rq,rs) => {
             <br><a href="/">return</a>
         `);
     }
+    if( rq.url == "/stat_json" ){
+        rs.writeHead(200,{ "Content-Type": "application/json" })
+        rs.end(
+            JSON.stringify({
+                Platform: os.platform(),
+                Release: os.release(),
+                Arch: os.arch(),
+                CPUinfo: cpuinfo(),
+                ServerRuntime: os.uptime(),
+                MemTotal: os.totalmem(),
+                MemoryFree: os.freemem()
+            })
+        );
+    }
 });
 
 const port = process.env.PORT || 4242;
