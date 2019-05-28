@@ -18,7 +18,7 @@ const server = http.createServer( (rq,rs) => {
     if( rq.url == "/stat" ){
         rs.write(`
             <html><body>
-                <h3>Server information</h3>
+                <h1>Server information</h1>
                 <br>Platform: ${os.platform()}
                 <br>Release: ${os.release()}
                 <br>Arch: ${os.arch()}

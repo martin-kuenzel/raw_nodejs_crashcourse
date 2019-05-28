@@ -4,7 +4,8 @@
   "description": "just4learning",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node indexClosing",
+    "dev": "nodemon indexClosing.js"
   },
   "author": "Martin Künzel",
   "license": "ISC",
