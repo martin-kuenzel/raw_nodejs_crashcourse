@@ -9,3 +9,5 @@ const logger = new Logger();
 logger.on( 'log_message', (data) => console.log(`Listener has been called`, data) );
 
 logger.log("Die Antwort ist natürlich 42");
+
+/////////////////
