@@ -12,7 +12,22 @@ if( !fs.existsSync(crPath) ){
 }
 
 // write the output of a Person.toString() into crPath/theFile
-fs.writeFile(path.join(crPath,"theFile.txt"), (new Person).toString(), err => {
+fs.writeFile(path.join(crPath,"theFile.txt"), "\n"+(new Person()).toString(), err => {
     if(err) throw err;
     console.log("successfully written theFile");
+
+    // append the output of another Person.toString() into crPath/theFile
+    fs.appendFile(path.join(crPath,"theFile.txt"), "\n"+(new Person("Martin","the Codejunky")).toString(), err => {
+        if(err) throw err;
+        console.log("successfully written theFile");
+
+        // read the contents of theFile and print it to console
+        fs.readFile(path.join(crPath,"theFile.txt"),'utf8',(err,data)=>{
+            if(err) throw err;
+            console.log(data.toString());
+        })
+
+    });
+
 });
+
